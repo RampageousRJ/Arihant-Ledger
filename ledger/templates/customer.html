@@ -107,7 +107,7 @@
                     <a href="{{url_for('customer',phone=order.phone)}}" style="text-decoration:none;">{{ order.phone }}</a>
                 </div>
                 <div class="col text-right">
-                    {{ order._id }}
+                {{ order._id }}
                 </div>
                 </div>
             </div>
@@ -115,9 +115,9 @@
                     <blockquote class="blockquote mb-0">
                         <p>{{ order.detail }}</p>
                         {% if order.amount-order.paid>0 %}
-                        <p style="font-size: 75%; color:red"><i>-₹{{order.amount-order.paid}}</i></p>
+                        <p style="font-size: 75%; color:red"><i>-₹{{(order.amount-order.paid)|abs}}</i></p>
                         {% else %}
-                    <p style="font-size: 75%; color: green;"><i>+₹{{order.amount-order.paid}}</i></p>
+                        <p style="font-size: 75%; color: green;"><i>+₹{{(order.amount-order.paid)|abs}}</i></p>
                         {% endif %}
                         <footer class="blockquote-footer"> <cite title="Author name">{{ customer.name }}</cite> billed on {{ order.date_added.strftime('%Y-%m-%d') }}</footer>
                     </blockquote>

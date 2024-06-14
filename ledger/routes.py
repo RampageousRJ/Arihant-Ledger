@@ -52,20 +52,57 @@ def logout():
 @app.route('/posts/sort/<string:sort_selected>')
 def sort(sort_selected):
     if "user" in session:
-        if sort_selected=='week':
-            minus_days=-7
-            sorted_by='Past Week'
-        elif sort_selected=='month':
-            minus_days=-30
-            sorted_by='Past Month'
-        elif sort_selected=='year':
-            minus_days=-365
-            sorted_by='Past Year'
+        form = SearchForm()
+        if sort_selected=='name-ascending':
+            customers = mongo.db.customers.find().sort({'name':1})
+        elif sort_selected=='name-descending':
+            customers = mongo.db.customers.find().sort({'name':-1})
+        elif sort_selected=='balance-ascending':
+            customers = mongo.db.customers.find().sort({'balance':1})
+        elif sort_selected=='balance-descending':
+            customers = mongo.db.customers.find().sort({'balance':-1})
         else:
-            return render_template('404.html'), 404
-        posts=mongo.db.customers.find().sort({'name':1})
-        return render_template('posts.html',posts=posts,sorted_by=sorted_by) 
+            return redirect(url_for('dashboard'))
+        return render_template('dashboard.html',customers=customers,form=form)
     return redirect(url_for('login'))
+
+@app.route('/posts/sort_history/<string:sort_selected>')
+def sort_history(sort_selected):
+    if "user" in session:
+        form = SearchForm()
+        pipeline = [
+            {
+                "$lookup": {
+                    "from": "customers",
+                    "localField": "phone",
+                    "foreignField": "phone",
+                    "as": "customer"
+                }
+            },
+            {
+                "$unwind": "$customer"
+            },
+            {
+                "$addFields": {
+                    "balance_difference": {"$subtract": ["$amount", "$paid"]}
+                }
+            }
+        ]
+        if sort_selected == 'date-ascending':
+            pipeline.append({"$sort": {"date_added": 1}})
+        elif sort_selected == 'date-descending':
+            pipeline.append({"$sort": {"date_added": -1}})
+        elif sort_selected == 'amount-ascending':
+            pipeline.append({"$sort": {"balance_difference": 1}})
+        elif sort_selected == 'amount-descending':
+            pipeline.append({"$sort": {"balance_difference": -1}})
+        else:
+            return redirect(url_for('dashboard'))
+
+        orders = list(mongo.db.orders.aggregate(pipeline))
+        return render_template('history.html', orders=orders, form=form)
+    return redirect(url_for('login'))
+
 
 @app.route('/new-order/', methods=['GET', 'POST'], defaults={'phone': None})
 @app.route('/new-order/<string:phone>', methods=['GET', 'POST'])
@@ -100,35 +137,7 @@ def new_order(phone):
 @app.route('/history/')
 def history():
     if "user" in session:
-        orders = mongo.db.orders.aggregate([{
-                                            "$lookup": {
-                                            "from": "customers",
-                                            "localField": "phone", 
-                                            "foreignField": "phone",
-                                            "as": "customer"
-                                            }
-                                        },
-                                        {
-                                            "$unwind": "$customer"
-                                        },
-                                        {
-                                            "$project": {
-                                            "order_id": "$_id",
-                                            "phone": 1,
-                                            "detail": 1,
-                                            "amount": 1,
-                                            "paid": 1,
-                                            "date_added": 1,
-                                            "customer.phone": 1, 
-                                            "customer.name": 1,
-                                            "customer.address": 1,
-                                            "customer.balance": 1
-                                            }
-                                        },
-                                        {
-                                            "$sort": {"date_added": -1} 
-                                        }
-                                    ])
+        orders = mongo.db.orders.aggregate([{"$lookup": {"from": "customers","localField": "phone","foreignField": "phone","as": "customer"}},{"$unwind": "$customer"},{"$project": {"order_id": "$_id","phone": 1,"detail": 1,"amount": 1,"paid": 1,"date_added": 1,"customer.phone": 1,"customer.name": 1,"customer.address": 1,"customer.balance": 1}},{"$sort": {"date_added": -1}}])
         return render_template('history.html',orders=orders)
     return redirect(url_for('login'))
 

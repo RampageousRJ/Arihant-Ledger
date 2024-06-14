@@ -58,14 +58,12 @@
                     <div class="row">
                         <div class="col">
                             <div class="dropdown show text-left">
-                                <a class="btn btn-secondary dropdown-toggle bg-dark" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Sort By
-                                </a>
-                            
+                                <a class="btn btn-secondary dropdown-toggle bg-dark" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort By </a>
                                 <div class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuLink">
-                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='week')}}" style="color: grey;">Past Week</a>
-                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='month')}}" style="color: grey;">Past Month</a>
-                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='year')}}" style="color: grey;">Past Year</a>
+                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='name-ascending')}}" style="color: grey;">Name Ascending</a>
+                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='name-descending')}}" style="color: grey;">Name Descending</a>
+                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='balance-ascending')}}" style="color: grey;">Balance Ascending</a>
+                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='balance-descending')}}" style="color: grey;">Balance Descending</a>
                                 </div>
                             </div>
                         </div>

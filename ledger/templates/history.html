@@ -61,9 +61,10 @@
                     </a>
                 
                     <div class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuLink">
-                    <a class="dropdown-item" href="{{url_for('sort',sort_selected='week')}}" style="color: grey;">Past Week</a>
-                    <a class="dropdown-item" href="{{url_for('sort',sort_selected='month')}}" style="color: grey;">Past Month</a>
-                    <a class="dropdown-item" href="{{url_for('sort',sort_selected='year')}}" style="color: grey;">Past Year</a>
+                    <a class="dropdown-item" href="{{url_for('sort_history',sort_selected='date-ascending')}}" style="color: grey;">Date Ascending</a>
+                    <a class="dropdown-item" href="{{url_for('sort_history',sort_selected='date-descending')}}" style="color: grey;">Date Descending</a>
+                    <a class="dropdown-item" href="{{url_for('sort_history',sort_selected='amount-ascending')}}" style="color: grey;">Amount Ascending</a>
+                    <a class="dropdown-item" href="{{url_for('sort_history',sort_selected='amount-descending')}}" style="color: grey;">Amount Descending</a>
                     </div>
                 </div>
                 <br>
@@ -83,9 +84,9 @@
                     <blockquote class="blockquote mb-0">
                         <p>{{ order.detail }}</p>
                         {% if order.amount-order.paid>0 %}
-                        <p style="font-size: 75%; color:red"><i>-₹{{order.amount-order.paid}}</i></p>
+                        <p style="font-size: 75%; color:red"><i>-₹{{(order.amount-order.paid)|abs}}</i></p>
                         {% else %}
-                        <p style="font-size: 75%; color: green;"><i>+₹{{order.amount-order.paid}}</i></p>
+                        <p style="font-size: 75%; color: green;"><i>+₹{{(order.amount-order.paid)|abs}}</i></p>
                         {% endif %}
                         <footer class="blockquote-footer"> <cite title="Author name">{{ order.customer.name }}</cite> billed on {{ order.date_added.strftime('%Y-%m-%d') }}</footer>
                     </blockquote>
