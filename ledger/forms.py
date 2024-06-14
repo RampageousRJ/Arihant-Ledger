@@ -1,6 +1,6 @@
 import phonenumbers
 from flask_wtf import FlaskForm,RecaptchaField
-from wtforms import StringField,PasswordField,SubmitField,FloatField,TextAreaField
+from wtforms import StringField,PasswordField,SubmitField,FloatField,TextAreaField,BooleanField,DateField
 from wtforms.validators import Length,Email,EqualTo,DataRequired,ValidationError
 
 class LoginForm(FlaskForm):
@@ -23,3 +23,11 @@ class AddCustomerForm(FlaskForm):
                 raise ValueError()
         except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
             raise ValidationError('Invalid phone number')
+        
+class OrderForm(FlaskForm):
+    phone = StringField(label='Enter Phone ',validators=[DataRequired(),Length(min=10,max=10)])
+    detail = TextAreaField(label='Enter Detail ',validators=[DataRequired()])
+    amount = FloatField(label='Enter Amount ',validators=[DataRequired()])
+    paid = FloatField(label='Enter Amount Paid ')
+    date_added = DateField(label='Enter Date ',validators=[DataRequired()])
+    submit = SubmitField(label='Add Order')
