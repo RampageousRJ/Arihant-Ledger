@@ -83,6 +83,16 @@
                     </div>
                 </div>
             </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col">
+                        <a href="{{url_for('edit',phone = customer.phone)}}" class='btn btn-warning'>Edit Customer</a>
+                    </div>
+                    <div class="col text-right">
+                        <a href="{{url_for('new_order',phone=customer.phone)}}" class='btn btn-success'>New Entry</a>
+                    </div>
+                </div>
+            </div>
                 
             </div>
             <br>
@@ -94,11 +104,11 @@
         <div class="card-header">
             <div class="row d-flex flex-wrap align-items-center">
                 <div class="col text-left">
+                    <a href="{{url_for('customer',phone=order.phone)}}" style="text-decoration:none;">{{ order.phone }}</a>
+                </div>
+                <div class="col text-right">
                     {{ order._id }}
-                        </div>
-                    <div class="col text-right">
-                        <a href="{{url_for('customer',phone=order.phone)}}" style="text-decoration:none;">{{ order.phone }}</a>
-                    </div>
+                </div>
                 </div>
             </div>
                     <div class="card-body">

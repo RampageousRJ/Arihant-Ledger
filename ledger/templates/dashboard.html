@@ -55,17 +55,31 @@
                     <div class="col-10" style="padding:2% 2% 0 2%; text-align: center;">
                     <h2 style="text-shadow:1px 0 5px orange;">All Customers</h2>
                     <br>
-                    <div class="dropdown show text-left">
-                        <a class="btn btn-secondary dropdown-toggle bg-dark" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Sort By
-                        </a>
-                    
-                        <div class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuLink">
-                        <a class="dropdown-item" href="{{url_for('sort',sort_selected='week')}}" style="color: grey;">Past Week</a>
-                        <a class="dropdown-item" href="{{url_for('sort',sort_selected='month')}}" style="color: grey;">Past Month</a>
-                        <a class="dropdown-item" href="{{url_for('sort',sort_selected='year')}}" style="color: grey;">Past Year</a>
+                    <div class="row">
+                        <div class="col">
+                            <div class="dropdown show text-left">
+                                <a class="btn btn-secondary dropdown-toggle bg-dark" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Sort By
+                                </a>
+                            
+                                <div class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='week')}}" style="color: grey;">Past Week</a>
+                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='month')}}" style="color: grey;">Past Month</a>
+                                <a class="dropdown-item" href="{{url_for('sort',sort_selected='year')}}" style="color: grey;">Past Year</a>
+                                </div>
+                            </div>
                         </div>
+                        <div class="text-right">
+                            <div class="col text-right">
+                                <form class="form-inline" method='POST'>
+                                    {{form.hidden_tag()}}
+                                    {{form.value(class='form-control mr-sm-2', placeholder='Search')}}
+                                    {{form.submit(class='btn btn-outline-success my-2 my-sm-0')}}
+                                </form>
+                            </div>
+                        </div>  
                     </div>
+                    
                     <br>
                     <div class="table-responsive">
                         <table class="table table-hover table-dark">

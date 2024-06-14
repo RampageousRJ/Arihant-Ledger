@@ -72,10 +72,10 @@
                     <div class="card-header">
                     <div class="row d-flex flex-wrap align-items-center">
                         <div class="col text-left">
-                        {{ order._id }}
+                            <a href="{{url_for('customer',phone=order.phone)}}" style="text-decoration:none;">{{ order.phone }}</a>
                         </div>
                         <div class="col text-right">
-                        <a href="{{url_for('customer',phone=order.phone)}}" style="text-decoration:none;">{{ order.phone }}</a>
+                            {{ order._id}}
                         </div>
                     </div>
                     </div>

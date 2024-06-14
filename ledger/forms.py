@@ -26,8 +26,12 @@ class AddCustomerForm(FlaskForm):
         
 class OrderForm(FlaskForm):
     phone = StringField(label='Enter Phone ',validators=[DataRequired(),Length(min=10,max=10)])
-    detail = TextAreaField(label='Enter Detail ',validators=[DataRequired()])
+    detail = TextAreaField(label='Enter Detail ')
     amount = FloatField(label='Enter Amount ',validators=[DataRequired()])
     paid = FloatField(label='Enter Amount Paid ')
     date_added = DateField(label='Enter Date ',validators=[DataRequired()])
     submit = SubmitField(label='Add Order')
+    
+class SearchForm(FlaskForm):
+    value = StringField(label='Enter Value ')
+    submit = SubmitField(label='Search')

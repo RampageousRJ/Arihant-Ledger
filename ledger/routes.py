@@ -7,7 +7,6 @@ from datetime import datetime
 def login():
     form = LoginForm()
     if request.method=='POST':
-        print(mongo.db)
         user = mongo.db.users.find_one({'username':form.username.data, 'password':form.password.data})
         if user:
             flash("Logged in successfully")
@@ -20,9 +19,12 @@ def login():
 @app.route('/dashboard',methods=['GET','POST'])
 def dashboard():
     if "user" in session:
+        form = SearchForm()
         name = session['user']
         customers = mongo.db.customers.find({}).sort({'name':1})
-        return render_template('dashboard.html',name=name,customers=customers)
+        if request.method=='POST':
+            return redirect(url_for('filter',value=form.value.data))
+        return render_template('dashboard.html',name=name,customers=customers,form=form)
     return redirect(url_for('login')) 
 
 @app.route('/add_customer',methods=['GET','POST'])
@@ -65,10 +67,13 @@ def sort(sort_selected):
         return render_template('posts.html',posts=posts,sorted_by=sorted_by) 
     return redirect(url_for('login'))
 
-@app.route('/new-order/',methods=['GET','POST'])
-def new_order():
+@app.route('/new-order/', methods=['GET', 'POST'], defaults={'phone': None})
+@app.route('/new-order/<string:phone>', methods=['GET', 'POST'])
+def new_order(phone):
     if "user" in session:
         form = OrderForm()
+        if phone:
+            form.phone.data = phone
         if request.method=='POST':
             phone = form.phone.data
             customer = mongo.db.customers.find_one({'phone':phone})
@@ -132,5 +137,51 @@ def customer(phone):
     if "user" in session:
         customer = mongo.db.customers.find_one({'phone':phone})
         orders = mongo.db.orders.find({'phone':phone}).sort({'date_added':-1})
-        return render_template('customer.html',customer=customer,orders=orders)
+        return render_template('customer.html',customer=customer,orders=orders,phone=phone)
+    return redirect(url_for('login'))
+
+@app.route('/dashboard/filter/<string:value>',methods=['GET','POST'])
+def filter(value):
+    form = SearchForm()
+    customers = mongo.db.customers.find().sort({'name':1})
+    value = value.strip()
+    print(value)
+    if value=="":
+        return redirect(url_for('dashboard'))
+    if request.method=='POST':
+        return redirect(url_for('filter',value=form.value.data))
+    if value.isnumeric():
+        phone = value
+        customers = mongo.db.customers.find({'phone':phone}).sort({'name':1})
+    else:
+        name = value
+        customers = mongo.db.customers.find({'name':name}).sort({'name':1})
+    return render_template('dashboard.html',customers=customers,form=form)
+
+@app.route('/edit/<string:phone>',methods=['GET','POST'])
+def edit(phone):
+    if "user" in session:
+        form = AddCustomerForm()
+        customer = mongo.db.customers.find_one({'phone':phone})
+        form.phone.data = customer['phone']
+        form.name.data = customer['name']
+        form.address.data = customer['address']
+        form.balance.data = customer['balance']
+        if request.method=='POST':
+            try:
+                mongo.db.customers.update_one({'phone':phone},{
+                    '$set':{
+                        'phone':form.phone.data,
+                        'name':form.name.data,
+                        'address':form.address.data,
+                        'balance':form.balance.data
+                    }
+                })
+            except Exception as e:
+                print(e)
+                flash("Error updating customer")
+                return redirect(url_for('edit',phone=phone))
+            flash("Customer updated successfully")
+            return redirect(url_for('customer',phone=phone))
+        return render_template('add_customer.html',form=form)
     return redirect(url_for('login'))
