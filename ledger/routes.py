@@ -179,7 +179,7 @@ def new_order(phone):
                 print(e)
                 flash("Error updating balance")
             flash("Order added successfully")
-            return redirect(url_for('new_order'))
+            return redirect(url_for('customer',phone=form.phone.data))
         return render_template('orders.html',form=form)
     return redirect(url_for('login'))
 
@@ -266,21 +266,3 @@ def edit(phone):
             return redirect(url_for('customer',phone=phone))
         return render_template('add_customer.html',form=form)
     return redirect(url_for('login'))
-
-
-# @app.route('/edit_customer',methods=['GET','POST'])
-# def edit():
-#     if "user" in session:
-#         form = AddCustomerForm()
-#         oform = OrderForm()
-#         if request.method=='POST':
-#             mongo.db.customers.insert_one({
-#                 'phone':form.phone.data,
-#                 'name':form.name.data,
-#                 'address':form.address.data,
-#                 'balance':form.balance.data
-#             })
-#             flash("Customer edited successfully")
-#             return redirect(url_for('customer', phone=form.phone.data))
-#         return render_template('add_customer.html',form=form)
-#     return redirect(url_for('login')) 
