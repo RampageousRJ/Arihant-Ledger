@@ -243,26 +243,31 @@ def filter(value):
 def edit(phone):
     if "user" in session:
         form = AddCustomerForm()
+        if request.method=='POST':
+            if form.validate_on_submit():
+                try:
+                    print(form.phone.data,form.name.data,form.address.data,form.balance.data)
+                    result = mongo.db.customers.update_many({'phone':phone},{
+                        '$set':{
+                            'phone':form.phone.data,
+                            'name':form.name.data,
+                            'address':form.address.data,
+                            'balance':form.balance.data
+                        }
+                    })
+                    print(result.modified_count)
+                except Exception as e:
+                    print(e)
+                    flash("Error updating customer")
+                    return redirect(url_for('edit',phone=phone))
+                flash("Customer updated successfully")
+                return redirect(url_for('customer',phone=phone))
+            else:
+                print(form.errors)
         customer = mongo.db.customers.find_one({'phone':phone})
         form.phone.data = customer['phone']
         form.name.data = customer['name']
         form.address.data = customer['address']
         form.balance.data = customer['balance']
-        if request.method=='POST':
-            try:
-                mongo.db.customers.update_one({'phone':phone},{
-                    '$set':{
-                        'phone':form.phone.data,
-                        'name':form.name.data,
-                        'address':form.address.data,
-                        'balance':form.balance.data
-                    }
-                })
-            except Exception as e:
-                print(e)
-                flash("Error updating customer")
-                return redirect(url_for('edit',phone=phone))
-            flash("Customer updated successfully")
-            return redirect(url_for('customer',phone=phone))
         return render_template('add_customer.html',form=form)
     return redirect(url_for('login'))
