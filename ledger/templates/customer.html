@@ -115,9 +115,9 @@
                     <blockquote class="blockquote mb-0">
                         <p>{{ order.detail }}</p>
                         {% if order.amount-order.paid>0 %}
-                        <p style="font-size: 75%; color:red"><i>-₹{{(order.amount-order.paid)|abs}}</i></p>
+                        <p style="font-size: 75%; color:red"><i>-{{(order.amount-order.paid)|abs|format_inr}}</i></p>
                         {% else %}
-                        <p style="font-size: 75%; color: green;"><i>+₹{{(order.amount-order.paid)|abs}}</i></p>
+                        <p style="font-size: 75%; color: green;"><i>+{{(order.amount-order.paid)|abs|format_inr}}</i></p>
                         {% endif %}
                         <footer class="blockquote-footer"> <cite title="Author name">{{ customer.name }}</cite> billed on {{ order.date_added.strftime('%Y-%m-%d') }}</footer>
                     </blockquote>

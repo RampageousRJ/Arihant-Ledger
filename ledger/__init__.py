@@ -5,10 +5,11 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_pymongo import PyMongo
 from dotenv import load_dotenv
+from flask_datepicker import datepicker
 load_dotenv()
 
 app = Flask(__name__)
-
+datepicker(app)
 app.config['MONGO_URI'] = os.getenv('MONGO_URI')
 app.config['SECRET_KEY'] = os.getenv('LEDGER_SECRET_KEY')
 app.config['RECAPTCHA_PUBLIC_KEY'] = os.getenv('LEDGER_PUBLIC_KEY')

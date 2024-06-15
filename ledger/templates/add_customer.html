@@ -52,8 +52,50 @@
     <br>
     <form method="POST" class='form-register'>
         <div class="row gx-1">
-            <div class="col-md-3">
+            {% if oform %}
+            <div class="col-md-1"></div>
+            <div class="col-md-4 shadow-lg p-3 bg-dark">
+                <br>
+                <h3 class="text-center">Add Customer</h3>
+                <div class="form-labels">
+                    {{form.hidden_tag()}}
+                    {{form.phone.label()}}
+                    {{form.phone(class='form-control', placeholder='Phone')}}
+                    <br>
+                    {{form.name.label()}}
+                    {{form.name(class='form-control', placeholder='Name')}}
+                    <br>
+                    {{form.address.label()}}
+                    {{form.address(class='form-control', rows=5, placeholder='Address')}}
+                    <br>
+                    <div class="text-center">
+                        {{form.submit(class='btn btn-success btn')}}
+                    </div>
+                </div>
             </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-4 shadow-lg p-3 bg-dark">
+                <br>
+                <h3 class="text-center">New Entry</h3>
+                <div class="form-labels">
+                    {{oform.hidden_tag()}}
+                    <br>
+                    {{oform.amount.label()}}
+                    {{oform.amount(class='form-control', placeholder='Total Amount')}}
+                    <br>
+                    {{oform.paid.label()}}
+                    {{oform.paid(class='form-control', placeholder='Amount Paid')}}
+                    <br>
+                    {{oform.detail.label()}}
+                    {{oform.detail(class='form-control', rows=5, placeholder='Entry Details')}}
+                    <br>
+                    <div class="text-center">
+                        {{oform.submit(class='btn btn-success btn')}}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-md-3"></div>
             <div class="col-md-6 shadow-lg p-3 bg-dark">
                 <br>
                 <h3 class="text-center">Add Customer</h3>
@@ -76,6 +118,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </form>
     <br />
