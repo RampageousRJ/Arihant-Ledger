@@ -1,7 +1,9 @@
 from ledger import app,mongo
 from ledger.forms import *
-from flask import render_template,request,flash,session,redirect,url_for
+from flask import render_template,request,flash,session,redirect,url_for,send_file
 from datetime import datetime,timedelta
+import pandas as pd
+from io import BytesIO
 import bson
 import re
 
@@ -116,7 +118,7 @@ def sort(sort_selected):
         return render_template('dashboard.html',customers=customers,form=form,transaction=list(transaction))
     return redirect(url_for('login'))
 
-@app.route('/posts/sort_history/<string:sort_selected>')
+@app.route('/posts/sort_history/<string:sort_selected>', methods=['GET', 'POST'])
 def sort_history(sort_selected):
     if "user" in session:
         pipeline = [
@@ -149,7 +151,15 @@ def sort_history(sort_selected):
             return redirect(url_for('history'))
         form = DateForm()
         orders = list(mongo.db.orders.aggregate(pipeline))
-        return render_template('history.html', orders=orders, form=form)
+        if request.method=="POST":
+            if form.entrydate.data:
+                selected_date = form.entrydate.data
+                selected_date_mongo = bson.datetime.datetime(selected_date.year, selected_date.month, selected_date.day)
+                end_date_mongo = selected_date_mongo + timedelta(days=1)
+                order = mongo.db.orders.aggregate([{"$lookup": {"from": "customers","localField": "phone","foreignField": "phone","as": "customer"}},{"$unwind": "$customer"},{"$match": {"date_added": {"$gte": selected_date_mongo,"$lt": end_date_mongo}}},{"$project": {"order_id": "$_id","phone": 1,"detail": 1,"amount": 1,"paid": 1,"date_added": 1,"customer.phone": 1,"customer.name": 1,"customer.address": 1,"customer.balance": 1}},{"$sort": {"date_added": -1}}])
+                return render_template('history.html',orders=list(order),form=form)
+            return redirect(url_for('history'))
+        return render_template('history.html', orders=list(orders), form=form)
     return redirect(url_for('login'))
 
 
@@ -194,9 +204,9 @@ def history():
                 selected_date_mongo = bson.datetime.datetime(selected_date.year, selected_date.month, selected_date.day)
                 end_date_mongo = selected_date_mongo + timedelta(days=1)
                 order = mongo.db.orders.aggregate([{"$lookup": {"from": "customers","localField": "phone","foreignField": "phone","as": "customer"}},{"$unwind": "$customer"},{"$match": {"date_added": {"$gte": selected_date_mongo,"$lt": end_date_mongo}}},{"$project": {"order_id": "$_id","phone": 1,"detail": 1,"amount": 1,"paid": 1,"date_added": 1,"customer.phone": 1,"customer.name": 1,"customer.address": 1,"customer.balance": 1}},{"$sort": {"date_added": -1}}])
-                return render_template('history.html',orders=order,form=form)
+                return render_template('history.html',orders=list(order),form=form)
             return redirect(url_for('history'))
-        return render_template('history.html',orders=order,form=form)
+        return render_template('history.html',orders=list(order),form=form)
     return redirect(url_for('login'))
 
 @app.route('/customer/<string:phone>')
@@ -255,9 +265,7 @@ def edit(phone):
                             'balance':form.balance.data
                         }
                     })
-                    print(result.modified_count)
                 except Exception as e:
-                    print(e)
                     flash("Error updating customer")
                     return redirect(url_for('edit',phone=phone))
                 flash("Customer updated successfully")
@@ -270,4 +278,22 @@ def edit(phone):
         form.address.data = customer['address']
         form.balance.data = customer['balance']
         return render_template('add_customer.html',form=form)
+    return redirect(url_for('login'))
+
+@app.route('/export', methods=['GET'])
+def export():
+    if "user" in session:
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            collections = mongo.db.list_collection_names()
+            for collection_name in collections:
+                collection = mongo.db[collection_name]
+                data = list(collection.find())
+                if data:
+                    df = pd.DataFrame(data)
+                    if '_id' in df.columns:
+                        df.drop(columns=['_id'], inplace=True)
+                    df.to_excel(writer, sheet_name=collection_name, index=False)
+        output.seek(0)
+        return send_file(output, download_name="ledger-database.xlsx", as_attachment=True)
     return redirect(url_for('login'))
