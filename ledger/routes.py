@@ -231,7 +231,7 @@ def filter(value):
         phone = value
         customers = mongo.db.customers.find({'phone':phone}).sort({'name':1})
     else:
-        name = value
+        name = value[0].upper() + value[1:].lower()
         customers = mongo.db.customers.find({'name':name}).sort({'name':1})
         transaction = mongo.db.customers.aggregate([
                 {
