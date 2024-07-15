@@ -162,3 +162,5 @@ cython_debug/
 randomcode.txt
 
 virt/
+
+ledger/testing/
